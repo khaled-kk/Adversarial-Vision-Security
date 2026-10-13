@@ -1,39 +1,37 @@
-# 🛡️ Adversarial Vision Security
+# Adversarial Vision Security
 
-[![Field: AI Security](https://img.shields.io/badge/Field-Adversarial--ML-red.svg)]()
-[![Defense: JPEG-Compression](https://img.shields.io/badge/Defense-JPEG--Robustness-green.svg)]()
-[![Status: Research](https://img.shields.io/badge/Status-Complete-success.svg)]()
+Evaluating how adversarial attacks degrade an ImageNet classifier, and how JPEG compression performs as a pre-processing defence.
 
-**Adversarial Vision Security** is a research project exploring the vulnerability of Convolutional Neural Networks (CNNs) to adversarial perturbations. This repository demonstrates how imperceptible noise can deceive state-of-the-art classifiers and evaluates the effectiveness of JPEG-based defense mechanisms in restoring model accuracy.
+## Overview
 
-## ⚔️ The Attack Phase
-The project implements adversarial attacks that introduce "invisible" noise into image data. This noise is mathematically optimized to:
-*   **Maximize Loss:** Specifically targeting the model's gradient to force a misclassification.
-*   **Maintain Perceptual Integrity:** Ensuring the image looks unchanged to the human eye while being "nonsense" to the neural network.
+This project attacks a pretrained **InceptionV3** model (ImageNet weights) with two gradient-based attacks, **FGSM** and **PGD**, and then measures how much accuracy JPEG compression restores when it is applied to the adversarial images before classification.
 
-## 🛡️ The Defense Mechanism (JPEG Compression)
-To counter these attacks, the project implements a pre-processing defense layer. 
-*   **Logic:** Adversarial perturbations often reside in high-frequency components of the image. 
-*   **Execution:** By applying strategic **JPEG Compression**, we effectively "clean" the image by removing these high-frequency artifacts before they reach the classifier.
-*   **Result:** Significant restoration of classification accuracy against low-to-medium intensity attacks.
+- **Model:** InceptionV3 (`weights='imagenet'`), TensorFlow/Keras
+- **Data:** ImageNet ILSVRC2012 validation images, 299x299, with the official ground-truth mapping
+- **Attacks:** FGSM and PGD at epsilon 0, 2 and 6 (epsilon 0 is the no-attack reference)
+- **Defence:** JPEG re-compression at quality factors QF-10 to QF-100, compared with no defence
+- **Metrics:** Top-1 and Top-5 accuracy for every attack, epsilon and quality factor
 
-## 🛠️ Technical Stack
-*   **Deep Learning Framework:** [e.g., TensorFlow / PyTorch]
-*   **Image Processing:** [e.g., OpenCV / PIL]
-*   **Key Algorithms:** CNN Architectures, Gradient-based Attacks, and Loss Function Analysis.
+## Repository contents
 
-## 📊 Impact Analysis
-| Scenario | Model Accuracy |
-| :--- | :--- |
-| **Clean Images** | 98.2% |
-| **Adversarial Attack (No Defense)** | 12.5% |
-| **Adversarial Attack + JPEG Defense** | 84.1% |
+| File | Purpose |
+| --- | --- |
+| `IPM2S23.ipynb` | Full pipeline: label mapping, FGSM/PGD attack generation, JPEG defence, Top-1/Top-5 evaluation |
+| `attachment/` | ImageNet label and ground-truth mapping files used by the notebook |
+| `orignal and compresed images link.txt` | Google Drive link to the original, attacked and compressed image sets |
 
-## 🚀 Getting Started
-1. **Clone:** `git clone https://github.com/khaled-kk/Adversarial-Vision-Security.git`
-2. **Install:** `pip install -r requirements.txt`
-3. **Run Attack:** `python run_attack.py --image sample.jpg --method gradient`
-4. **Test Defense:** `python run_defense.py --image adversarial.jpg --compression 75`
+## How to run
 
----
-*Developed by Khaled Walid*
+1. Download the image folders from the Drive link in `orignal and compresed images link.txt`.
+2. Upload them to your own Google Drive using the same folder names the notebook expects (`FGSM/`, `pgd/`, `Sorted QF folders/`).
+3. Open `IPM2S23.ipynb` in Google Colab, mount Drive, and run the cells in order.
+4. The Top-1 and Top-5 accuracy tables are produced by the `findTOP1` and `findTOP5` cells at the end of the notebook.
+
+## Notes
+
+- The pipeline mounts Google Drive, so it is designed for Colab rather than local execution.
+- Attacks are untargeted perturbations of the input image; the defence never sees the model weights, it only re-encodes the image.
+
+<!-- TODO (Khaled): run the final cells, then paste the Top-1 / Top-5 results table here and add one sentence on which quality factor restores the most accuracy. -->
+
+*Developed by Khaled Walid, MSc Data Science, University of Europe for Applied Sciences.*
